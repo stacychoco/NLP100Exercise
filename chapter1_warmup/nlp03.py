@@ -17,7 +17,7 @@ def number_of_words(sentence):
     Returns a dictionary with the key being a word and the value being the number of letters in that word.
 
     :param sentence: the sentence which will be split into a list of words to put into the dictionary
-    :return: dictionary
+    :return word_dict:
     """
 
     # split sentence by space
