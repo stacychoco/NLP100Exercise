@@ -8,6 +8,7 @@ Chapter 3: Regular Expression
 Author: Stacy Nguyen
 """
 
+from collections import OrderedDict
 import os
 import json
 import re
@@ -68,7 +69,7 @@ def extract_category_lines(file_name):
     category_lines = []
     with open(file_name, 'r') as file:
         for line in file:
-            if re.search("^\\[\\[Category:.*]]", line):
+            if re.search(r"^\[\[Category:.*]]", line):
                 category_lines.append(line)
     return category_lines
 
@@ -81,10 +82,26 @@ def extract_category_names(category_lines):
     """
     category_names = []
     for line in category_lines:
-        search = re.search(":([\\w -]+)", line)
+        search = re.search(r":([\w -]+)", line)
         if search:
             category_names.append(search.group(1))
     return category_names
+
+
+def extract_sections(file_name):
+    """
+    Extracts section names in the article with their levels.
+    :param file_name: name of the article
+    :return: dictionary (key: section name, value: level)
+    """
+    # ordered dict will preserve the order of the section names
+    section_dict = OrderedDict()
+    with open(file_name, 'r') as file:
+        for line in file:
+            search = re.search(r"(={2,6})(.*)\1", line)
+            if search:
+                section_dict[search.group(2)] = len(search.group(1)) - 1
+    return section_dict
 
 
 if __name__ == '__main__':
@@ -110,6 +127,17 @@ if __name__ == '__main__':
     Extract the category names of the article.
     """
     cat_names = extract_category_names(cat_lines)
-    for name in cat_names:
-        print(name)
-    print(len(cat_names))
+    # for name in cat_names:
+    #     print(name)
+    # print(len(cat_names))
+
+    """
+    23. Section structure
+    Extract section names in the article with their levels. 
+    For example, the level of the section is 1 for the MediaWiki markup 
+    "== Section name ==".
+    """
+    section_names = extract_sections("uk_article.txt")
+    print(f'There are {len(section_names)} sections in total.\n')
+    for name in section_names:
+        print(f'{name}: Level {section_names[name]}')
