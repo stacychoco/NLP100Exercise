@@ -1,3 +1,4 @@
 https://realpython.com/read-write-files-python/
 https://realpython.com/python-exceptions/
 https://pynative.com/python-parse-multiple-json-objects-from-file/
+https://realpython.com/regex-python/
