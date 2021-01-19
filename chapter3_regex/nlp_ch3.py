@@ -22,6 +22,7 @@ def read_json(json_file):
     :param json_file: a string name of the file we're reading from
     :return json_list: list of json objects
     """
+    # note to self: this can be done in pandas within a line :)
     json_list = []
     with open(json_file, 'r') as file:
         for json_object in file:
@@ -98,10 +99,26 @@ def extract_sections(file_name):
     section_dict = OrderedDict()
     with open(file_name, 'r') as file:
         for line in file:
-            search = re.search(r"(={2,6})(.*)\1", line)
+            search = re.search(r"^(={2,6})(.+)\1", line)
             if search:
                 section_dict[search.group(2)] = len(search.group(1)) - 1
     return section_dict
+
+
+def extract_media_references(article):
+    """
+    Extracts references to media files linked from the article
+    :param article: name of the article (string)
+    :return: list of links
+    """
+    media_list = []
+    with open(article, 'r') as file:
+        for line in file:
+            # quick and dirty but gets the job done. surely there is a better way to approach this?
+            search = re.search(r'<ref[^>]*>[^<]*url=([^ |]+)[ |]+[^<]*</ref>', line)
+            if search:
+                media_list.append(search.group(1))
+    return media_list
 
 
 if __name__ == '__main__':
@@ -138,6 +155,15 @@ if __name__ == '__main__':
     "== Section name ==".
     """
     section_names = extract_sections("uk_article.txt")
-    print(f'There are {len(section_names)} sections in total.\n')
-    for name in section_names:
-        print(f'{name}: Level {section_names[name]}')
+    # print(f'There are {len(section_names)} sections in total.\n')
+    # for name in section_names:
+    #     print(f'{name}: Level {section_names[name]}')
+
+    """
+    24. Media references
+    Extract references to media files linked from the article.
+    """
+    media_refs = extract_media_references("uk_article.txt")
+    for ref in media_refs:
+        print(ref)
+    print(len(media_refs))
