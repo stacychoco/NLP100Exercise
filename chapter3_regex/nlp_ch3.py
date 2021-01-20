@@ -249,6 +249,6 @@ if __name__ == '__main__':
     infobox_without_markups = remove_emphasis_markup(infobox_fields)
     # problem 27
     infobox_without_links = remove_internal_links(infobox_without_markups)
-    print(f'There are {len(infobox_without_links)} infobox fields in total.\n')
-    for field in infobox_without_links:
-        print(f'{field}: {infobox_without_links[field]}')
+    # print(f'There are {len(infobox_without_links)} infobox fields in total.\n')
+    # for field in infobox_without_links:
+    #     print(f'{field}: {infobox_without_links[field]}')
