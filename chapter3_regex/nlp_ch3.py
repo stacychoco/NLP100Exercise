@@ -121,6 +121,53 @@ def extract_media_references(article):
     return media_list
 
 
+def get_infobox(article):
+    """
+    Gets the infobox from the given article
+    :param article: name of article
+    :return: string of the infobox
+    """
+    infobox_str = ""
+    found_infobox = False
+
+    with open(article, 'r') as file:
+        for line in file:
+            match1 = re.match(r'{{Infobox country', line)
+            match2 = re.match(r'}}', line)
+            if match1:
+                infobox_str += line
+                found_infobox = True
+            elif match2:
+                infobox_str += line
+                break
+            elif found_infobox:
+                infobox_str += line
+
+    return infobox_str
+
+
+def extract_infobox(article):
+    """
+    Extracts infobox into a dictionary object from an article txt file
+    :param article: article to extract from
+    :return: infobox dictionary
+    """
+    infobox_str = get_infobox(article)
+    infobox_list = infobox_str.splitlines()
+    infobox_dict = OrderedDict()
+    latest_group = ""
+
+    for line in infobox_list:
+        search = re.search(r'^\| ([^=]*) = (.*)', line)
+        if search:
+            latest_group = search.group(1)
+            infobox_dict[search.group(1)] = search.group(2)
+        else:
+            if latest_group:
+                infobox_dict[latest_group] += line
+    return infobox_dict
+
+
 if __name__ == '__main__':
     """
     20. Read JSON documents
@@ -164,6 +211,16 @@ if __name__ == '__main__':
     Extract references to media files linked from the article.
     """
     media_refs = extract_media_references("uk_article.txt")
-    for ref in media_refs:
-        print(ref)
-    print(len(media_refs))
+    # for ref in media_refs:
+    #     print(ref)
+    # print(len(media_refs))
+
+    """
+    25. Infobox
+    Extract field names and their values in the Infobox “country”, 
+    and store them in a dictionary object.
+    """
+    infobox_fields = extract_infobox("uk_article.txt")
+    print(f'There are {len(infobox_fields)} infobox fields in total.\n')
+    for field in infobox_fields:
+        print(f'{field}: {infobox_fields[field]}')
