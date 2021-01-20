@@ -168,6 +168,21 @@ def extract_infobox(article):
     return infobox_dict
 
 
+def remove_emphasis_markup(dict):
+    for key in dict:
+        replacement = re.sub("'{2,4}", "", dict[key])
+        dict[key] = replacement
+    return dict
+
+
+def remove_internal_links(dict):
+    for key in dict:
+        replacement1 = re.sub(r"\[\[", "", dict[key])
+        replacement2 = re.sub(r"]]", "", replacement1)
+        dict[key] = replacement2
+    return dict
+
+
 if __name__ == '__main__':
     """
     20. Read JSON documents
@@ -175,9 +190,9 @@ if __name__ == '__main__':
     Reuse the output in problems 21-29.
     """
     # read the json file into a list of json objects
-    json = read_json('enwiki-country.json')
+    json_data = read_json('enwiki-country.json')
     # extract the UK paragraph and write it to a text file
-    uk_body = read_body("United Kingdom", json)
+    uk_body = read_body("United Kingdom", json_data)
     write_to_file("uk_article.txt", uk_body)
 
     """
@@ -219,8 +234,21 @@ if __name__ == '__main__':
     25. Infobox
     Extract field names and their values in the Infobox “country”, 
     and store them in a dictionary object.
+    
+    26. Remove emphasis markups
+    In addition to the process of the problem 25, 
+    remove emphasis MediaWiki markups from the values.
+    
+    27. Remove internal links
+    In addition to the process of the problem 26, 
+    remove internal links from the values. See Help:Cheatsheet.
     """
+    # problem 25
     infobox_fields = extract_infobox("uk_article.txt")
-    print(f'There are {len(infobox_fields)} infobox fields in total.\n')
-    for field in infobox_fields:
-        print(f'{field}: {infobox_fields[field]}')
+    # problem 26
+    infobox_without_markups = remove_emphasis_markup(infobox_fields)
+    # problem 27
+    infobox_without_links = remove_internal_links(infobox_without_markups)
+    print(f'There are {len(infobox_without_links)} infobox fields in total.\n')
+    for field in infobox_without_links:
+        print(f'{field}: {infobox_without_links[field]}')
