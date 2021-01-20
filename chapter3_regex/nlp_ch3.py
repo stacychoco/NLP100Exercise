@@ -12,6 +12,7 @@ from collections import OrderedDict
 import os
 import json
 import re
+import requests
 
 
 def read_json(json_file):
@@ -123,7 +124,8 @@ def extract_media_references(article):
 
 def get_infobox(article):
     """
-    Gets the infobox from the given article
+    Gets the infobox from the given article.
+    I realized there are better ways to do this but this is an excuse for me to practice regex haha...
     :param article: name of article
     :return: string of the infobox
     """
@@ -160,8 +162,8 @@ def extract_infobox(article):
     for line in infobox_list:
         search = re.search(r'^\| ([^=]*) = (.*)', line)
         if search:
-            latest_group = search.group(1)
-            infobox_dict[search.group(1)] = search.group(2)
+            latest_group = search.group(1).strip()
+            infobox_dict[search.group(1).strip()] = search.group(2)
         else:
             if latest_group:
                 infobox_dict[latest_group] += line
@@ -181,6 +183,39 @@ def remove_internal_links(dict):
         replacement2 = re.sub(r"]]", "", replacement1)
         dict[key] = replacement2
     return dict
+
+
+def get_image_url(image_name):
+    """
+    Get URL of image using mediawiki API.
+    The function below closely resembles the mediawiki example in the following link:
+    https://www.mediawiki.org/wiki/API:Imageinfo
+    :param image_name: name of image file
+    :return: url of image
+    """
+    S = requests.Session()
+
+    URL = "https://en.wikipedia.org/w/api.php"
+
+    PARAMS = {
+        "action": "query",
+        "format": "json",
+        "prop": "imageinfo",
+        "titles": "File:" + image_name,
+        "iiprop": "url"
+    }
+
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
+
+    PAGES = DATA["query"]["pages"]
+
+    image_url = ""
+
+    for key in PAGES:
+        image_url = PAGES[key]["imageinfo"][0]["url"]
+
+    return image_url
 
 
 if __name__ == '__main__':
@@ -252,3 +287,11 @@ if __name__ == '__main__':
     # print(f'There are {len(infobox_without_links)} infobox fields in total.\n')
     # for field in infobox_without_links:
     #     print(f'{field}: {infobox_without_links[field]}')
+
+    """
+    29. Country flag
+    Obtain the URL of the country flag by using the analysis result of Infobox. 
+    (Hint: convert a file reference to a URL by calling imageinfo in MediaWiki API)
+    """
+    flag_url = get_image_url(infobox_without_links['image_flag'])
+    # print(flag_url)
