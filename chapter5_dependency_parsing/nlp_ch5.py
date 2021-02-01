@@ -9,12 +9,9 @@ Author: Stacy Nguyen
 """
 
 import spacy
-from nltk.tokenize import word_tokenize
 
-
+# Demo of spacy module:
 """
-* Demo of spacy:
-
 nlp = spacy.load("en_core_web_sm")
 doc = nlp("Autonomous cars shift insurance liability toward manufacturers")
 for token in doc:
@@ -24,12 +21,16 @@ for token in doc:
 
 
 class Word:
-    def __init__(self, text):
-        nlp = spacy.load("en_core_web_sm")
-        word = nlp(text)
-        self.text = word.text
-        self.lemma = word.lemma_
-        self.pos = word.pos_
+    def __init__(self, text, lemma="", pos=""):
+        self.text = text
+        self.lemma = lemma
+        self.pos = pos
+
+
+def load_parse_result(sentence):
+    nlp = spacy.load("en_core_web_sm")
+    data = nlp(sentence)
+    return data
 
 
 def convert_sentence(sentence):
@@ -38,12 +39,10 @@ def convert_sentence(sentence):
     :param sentence:
     :return: converted sentence
     """
-    word_array = word_tokenize(sentence)
-
-    for i in range(len(word_array)):
-        word_object = Word(word_array[i])
-        word_array[i] = word_object
-
+    data = load_parse_result(sentence)
+    word_array = []
+    for token in data:
+        word_array.append(Word(token.text, token.lemma_, token.pos_))
     return word_array
 
 
@@ -55,4 +54,10 @@ if __name__ == '__main__':
     Implement a program to load the parse result, and store the text as an array of sentences. 
     Show the object of the first sentence of the body of the article.
     """
-    print(convert_sentence("I am a fish"))
+    # This sentence is now represented as a list of Word objects
+    converted_sentence = convert_sentence("Sometimes, people become superheroes.")
+    for object in converted_sentence:
+        print(object.text, object.lemma, object.pos)
+
+    # Represent article as a list of sentences
+    # Output the first sentence of the text
