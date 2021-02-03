@@ -9,15 +9,8 @@ Author: Stacy Nguyen
 """
 
 import spacy
+from spacy import displacy
 from nltk.tokenize import sent_tokenize
-
-
-# ***Demo of spacy module:***
-# nlp = spacy.load("en_core_web_sm")
-# doc = nlp("Autonomous cars shift insurance liability toward manufacturers")
-# for token in doc:
-#     print(token.text, token.dep_, token.head.text, token.head.pos_,
-#             [child for child in token.children])
 
 
 class Word:
@@ -83,14 +76,28 @@ class Sentence:
             word = self.converted_sentence[index]
             if word.dep == "ROOT":
                 triples[1] = word.text
-            elif word.dep == "nsubj":
+            elif word.dep == "nsubj" or word.dep == "nsubjpass":
                 span = self.data[self.data[index].left_edge.i:self.data[index].right_edge.i + 1]
                 triples[0] = str(span)
-            elif word.dep == "dobj":
+            elif word.dep == "dobj" or word.dep == "pobj":
                 span = self.data[self.data[index].left_edge.i:self.data[index].right_edge.i + 1]
                 triples[2] = str(span)
 
         return triples
+
+    def visualize(self):
+        return displacy.render(self.data, style='dep')
+
+    def noun_verb_pairs(self):
+        """
+        Show all pairs of verb governors (parents) and their noun dependents (children).
+        """
+        pairs = []
+        for token in self.data:
+            if token.pos_ == "NOUN":
+                if token.head.pos_ == "VERB":
+                    pairs.append([token.head.text, token.text])
+        return pairs
 
 
 if __name__ == '__main__':
@@ -114,12 +121,14 @@ if __name__ == '__main__':
     tokenized_article = sent_tokenize(article)
 
     # Output the first sentence of the text as a list of objects
-    print("Original sentence:", tokenized_article[1], "\n")
+    sentence = tokenized_article[1]
+    print("Original sentence:", sentence, "\n")
 
     # This sentence is now represented as a list of Word objects
-    sentence_obj = Sentence(tokenized_article[1])
+    sentence_obj = Sentence(sentence)
     converted_sentence = sentence_obj.get_converted_sentence()
 
+    print("Order: text, lemma, pos, tag, head, dep, children\n")
     for object in converted_sentence:
         # problem 40: text, lemma, pos
         # problem 41: head, dep, children
@@ -134,6 +143,22 @@ if __name__ == '__main__':
     print("\nRoot:", root, "\n")
 
     """
+    43. Show verb governors and noun dependents
+    Show all pairs of verb governors (parents) and their noun dependents (children) 
+    from all sentences in the text.
+    """
+    print("Verb governors (parents) and their noun dependents (children):")
+    print(sentence_obj.noun_verb_pairs(), "\n")
+
+    """
+    44. Visualize dependency trees
+    """
+    # visualize.html will display the dependency tree
+    with open("visualize.html", 'r+') as file:
+        file.truncate(0)
+        file.write(sentence_obj.visualize())
+
+    """
     45. Triple with subject, verb, and direct object
     Extract tuples from dependency trees where:
         - subject is a nominal subject of a verb in the past tense
@@ -141,5 +166,7 @@ if __name__ == '__main__':
         - object is a direct object of the verb
         
     46. Expanding subjects and objects
+    47. Triple from the passive sentence
     """
-    print("Triples:", Sentence(tokenized_article[1]).get_triples())
+    # I modified the triple so that the predicate is the verb even if not in past tense
+    print("Triples:", sentence_obj.get_triples(), "\n")

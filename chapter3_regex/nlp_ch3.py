@@ -53,7 +53,7 @@ def write_to_file(file_name, body):
     :param body: body of the article
     """
     if not os.path.exists(file_name) or file_is_empty(file_name):
-        with open(file_name, 'w') as file:
+        with open(file_name, 'rw') as file:
             file.write(body)
 
 
