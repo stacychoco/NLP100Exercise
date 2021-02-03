@@ -73,6 +73,7 @@ class Sentence:
             if found_all:
                 break
 
+            # the span is a bit long...
             word = self.converted_sentence[index]
             if word.dep == "ROOT":
                 triples[1] = word.text
