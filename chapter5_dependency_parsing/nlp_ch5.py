@@ -76,13 +76,13 @@ class Sentence:
             # the span is a bit long...
             word = self.converted_sentence[index]
             if word.dep == "ROOT":
-                triples[1] = word.text
+                triples[1] = word.lemma
             elif word.dep == "nsubj" or word.dep == "nsubjpass":
-                span = self.data[self.data[index].left_edge.i:self.data[index].right_edge.i + 1]
-                triples[0] = str(span)
+                #span = self.data[self.data[index].left_edge.i:self.data[index].right_edge.i + 1]
+                triples[0] = word.text
             elif word.dep == "dobj" or word.dep == "pobj":
-                span = self.data[self.data[index].left_edge.i:self.data[index].right_edge.i + 1]
-                triples[2] = str(span)
+                #span = self.data[self.data[index].left_edge.i:self.data[index].right_edge.i + 1]
+                triples[2] = word.text
 
         return triples
 

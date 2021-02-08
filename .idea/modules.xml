@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../GECResearch/.idea/GECResearch.iml" filepath="$PROJECT_DIR$/../GECResearch/.idea/GECResearch.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/NLP100Exercise.iml" filepath="$PROJECT_DIR$/.idea/NLP100Exercise.iml" />
     </modules>
   </component>
