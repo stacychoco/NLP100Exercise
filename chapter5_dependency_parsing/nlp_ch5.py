@@ -12,7 +12,6 @@ import spacy
 from spacy import displacy
 from nltk.tokenize import sent_tokenize
 
-
 class Word:
     def __init__(self, text, lemma="", pos="", tag="", head="", dep="", children=None):
         if children is None:
