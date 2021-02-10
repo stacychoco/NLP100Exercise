@@ -12,6 +12,7 @@ import spacy
 from spacy import displacy
 from nltk.tokenize import sent_tokenize
 
+
 class Word:
     def __init__(self, text, lemma="", pos="", tag="", head="", dep="", children=None):
         if children is None:
@@ -59,29 +60,22 @@ class Sentence:
 
     # noinspection PyTypeChecker
     def get_triples(self):
-        triples = [None] * 3
+        triples = []
 
-        for index in range(len(self.converted_sentence)):
-            # very rudimentary solution for a non-greedy search
-            # will probably have to optimize later
-            found_all = True
-            for phrase in triples:
-                if phrase is None:
-                    found_all = False
+        for token in self.data:
+            triple = [None] * 3
+            if token.pos_ == "VERB" and token.dep_ != "amod":
+                triple[1] = token.text
 
-            if found_all:
-                break
+                for child in token.children:
+                    if child.dep_ == "nsubj" or child.dep_ == "nsubjpass":
+                        triple[0] = child.text
 
-            # the span is a bit long...
-            word = self.converted_sentence[index]
-            if word.dep == "ROOT":
-                triples[1] = word.lemma
-            elif word.dep == "nsubj" or word.dep == "nsubjpass":
-                #span = self.data[self.data[index].left_edge.i:self.data[index].right_edge.i + 1]
-                triples[0] = word.text
-            elif word.dep == "dobj" or word.dep == "pobj":
-                #span = self.data[self.data[index].left_edge.i:self.data[index].right_edge.i + 1]
-                triples[2] = word.text
+                    if child.dep_ == "dobj" or child.dep_ == "pobj":
+                        triple[2] = child.text
+
+                # if triple[0] is not None and triple[2] is not None:
+                triples.append(triple)
 
         return triples
 
@@ -121,7 +115,7 @@ if __name__ == '__main__':
     tokenized_article = sent_tokenize(article)
 
     # Output the first sentence of the text as a list of objects
-    sentence = tokenized_article[1]
+    sentence = "So I think we can not live if old people could not find siences and tecnologies and they did not developped ."
     print("Original sentence:", sentence, "\n")
 
     # This sentence is now represented as a list of Word objects
@@ -170,3 +164,9 @@ if __name__ == '__main__':
     """
     # I modified the triple so that the predicate is the verb even if not in past tense
     print("Triples:", sentence_obj.get_triples(), "\n")
+    with open("dev.spellchecked.src", 'r') as file:
+        jfleg = file.readlines()
+
+    for line in jfleg[0:10]:
+        sentence = Sentence(line)
+        print(sentence.get_triples())
